@@ -17,6 +17,8 @@ function love.load()
   game_object_canvas:setFilter('nearest', 'nearest')
   trail_canvas = love.graphics.newCanvas(320, 240)
   trail_canvas:setFilter('nearest', 'nearest')
+
+  love.graphics.setLineStyle('rough')
 end
 
 function love.update(dt)
@@ -33,9 +35,15 @@ function love.draw()
   love.graphics.clear()
   for _, game_object in ipairs(game_objects) do
     if game_object.type == 'Trail' then
-      game_object:draw()
+      game_object:draw() -- 只绘制尾迹对象
     end
   end
+
+  love.graphics.setBlendMode('subtract')
+  for i = 0, 360, 2 do
+    love.graphics.line(i, 0, i, 240) -- 绘制端点位置分别为 (i, 0) 和 (i, 240) 的线段
+  end
+  love.graphics.setBlendMode('alpha')
   love.graphics.setCanvas()
 
   love.graphics.setCanvas(game_object_canvas)
