@@ -1,8 +1,9 @@
 local Trail = Object:extend()
 
-function Trail:new(x, y, opts)
+function Trail:new(type, x, y, opts)
   self.dead = false
   self.x, self.y = x, y
+  self.type = type
   local opts = opts or {}
   for k, v in pairs(opts) do self[k] = v end
 

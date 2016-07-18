@@ -1,7 +1,8 @@
 local GameObject = Object:extend()
 
-function GameObject:new(x, y, opts)
+function GameObject:new(type, x, y, opts)
   self.x, self.y = x, y
+  self.type = type
   local opts = opts or {}
   for k, v in pairs(opts) do self[k] = v end
 
