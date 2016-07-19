@@ -2,6 +2,7 @@ Object = require 'classic/classic'
 GameObject = require 'GameObject'
 Trail = require 'Trail'
 Timer = require 'hump/timer'
+Vector = require 'hump/vector'
 
 function love.load()
   timer = Timer()
@@ -19,6 +20,14 @@ function love.load()
   trail_canvas:setFilter('nearest', 'nearest')
 
   love.graphics.setLineStyle('rough')
+
+  trail_lines_extra_draw = {}
+  timer:every(0.1, function()
+    for i = -360, 720, 2 do
+      if love.math.random(1, 10) >= 2 then trail_lines_extra_draw[i] = false
+      else trail_lines_extra_draw[i] = true end
+    end
+  end)
 end
 
 function love.update(dt)
@@ -39,11 +48,16 @@ function love.draw()
     end
   end
 
+  pushRotate(160, 120, game_object.angle + math.pi/2)
   love.graphics.setBlendMode('subtract')
-  for i = 0, 360, 2 do
-    love.graphics.line(i, 0, i, 240) -- 绘制端点位置分别为 (i, 0) 和 (i, 240) 的线段
+  for i = -360, 720, 2 do
+    love.graphics.line(i, -240, i, 480)
+    if trail_lines_extra_draw[i] then
+      love.graphics.line(i+1, -240, i+1, 480)
+    end
   end
   love.graphics.setBlendMode('alpha')
+  love.graphics.pop()
   love.graphics.setCanvas()
 
   love.graphics.setCanvas(game_object_canvas)
@@ -74,4 +88,28 @@ function love.mousepressed(x, y, button)
   if button == 1 then
     game_object.dead = true
   end
+end
+
+function randomp(min, max)
+    return (min > max and (love.math.random()*(min - max) + max)) or (love.math.random()*(max - min) + min)
+end
+
+function pushRotate(x, y, r)
+  love.graphics.push()
+  love.graphics.translate(x, y)
+  love.graphics.rotate(r or 0)
+  love.graphics.translate(-x, -y)
+end
+
+function map(old_value, old_min, old_max, new_min, new_max)
+    local new_min = new_min or 0
+    local new_max = new_max or 1
+    local new_value = 0
+    local old_range = old_max - old_min
+    if old_range == 0 then new_value = new_min
+    else
+        local new_range = new_max - new_min
+        new_value = (((old_value - old_min)*new_range)/old_range) + new_min
+    end
+    return new_value
 end
